@@ -1,21 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import {imagesArray} from "./constants";
+import {Asset} from "expo-asset";
+import AppLoading from "expo-app-loading";
+import Navigation from "./navigation/Navigation";
+import Block from "./components/Block";
 
-export default function App() {
+
+
+const App = ()=> {
+  // state
+  const [isLoadingComplete, setIsLoadingComplete] = useState(false);
+
+  //event handlers
+  const handleResourcesAsync = () => {
+    const cacheImages = imagesArray.map((image: string | number) => {
+      return Asset.fromModule(image).downloadAsync()
+    });
+    return Promise.all(cacheImages);
+  }
+
+  if (!isLoadingComplete) {
+    return (
+        <AppLoading
+            startAsync={handleResourcesAsync}
+            onError={error => console.warn(error)}
+            onFinish={() => setIsLoadingComplete(true)}
+        />
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <Block white>
+      <Navigation />
+      </Block>
   );
+
+
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
+export default App;
